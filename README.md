@@ -5,26 +5,102 @@ Kroki предоставляет унифицированный API с подд�
 
 Пример работы Kroki:
 
-```graphviz
-digraph finite_state_machine {
-  rankdir=LR;
-  node [shape = doublecircle]; LR_0 LR_3 LR_4 LR_8;
-  node [shape = circle];
-  LR_0 -> LR_2 [ label = "SS(B)" ];
-  LR_0 -> LR_1 [ label = "SS(S)" ];
-  LR_1 -> LR_3 [ label = "S($end)" ];
-  LR_2 -> LR_6 [ label = "SS(b)" ];
-  LR_2 -> LR_5 [ label = "SS(a)" ];
-  LR_2 -> LR_4 [ label = "S(A)" ];
-  LR_5 -> LR_7 [ label = "S(b)" ];
-  LR_5 -> LR_5 [ label = "S(a)" ];
-  LR_6 -> LR_6 [ label = "S(b)" ];
-  LR_6 -> LR_5 [ label = "S(a)" ];
-  LR_7 -> LR_8 [ label = "S(b)" ];
-  LR_7 -> LR_5 [ label = "S(a)" ];
-  LR_8 -> LR_6 [ label = "S(b)" ];
-  LR_8 -> LR_5 [ label = "S(a)" ];
-}
+```vega
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "width": 400,
+  "height": 200,
+  "padding": 5,
+
+  "data": [
+    {
+      "name": "table",
+      "values": [
+        {"category": "A", "amount": 28},
+        {"category": "B", "amount": 55},
+        {"category": "C", "amount": 43},
+        {"category": "D", "amount": 91},
+        {"category": "E", "amount": 81},
+        {"category": "F", "amount": 53},
+        {"category": "G", "amount": 19},
+        {"category": "H", "amount": 87}
+      ]
+    }
+  ],
+
+  "signals": [
+    {
+      "name": "tooltip",
+      "value": {},
+      "on": [
+        {"events": "rect:mouseover", "update": "datum"},
+        {"events": "rect:mouseout",  "update": "{}"}
+      ]
+    }
+  ],
+
+  "scales": [
+    {
+      "name": "xscale",
+      "type": "band",
+      "domain": {"data": "table", "field": "category"},
+      "range": "width",
+      "padding": 0.05,
+      "round": true
+    },
+    {
+      "name": "yscale",
+      "domain": {"data": "table", "field": "amount"},
+      "nice": true,
+      "range": "height"
+    }
+  ],
+
+  "axes": [
+    { "orient": "bottom", "scale": "xscale" },
+    { "orient": "left", "scale": "yscale" }
+  ],
+
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data":"table"},
+      "encode": {
+        "enter": {
+          "x": {"scale": "xscale", "field": "category"},
+          "width": {"scale": "xscale", "band": 1},
+          "y": {"scale": "yscale", "field": "amount"},
+          "y2": {"scale": "yscale", "value": 0}
+        },
+        "update": {
+          "fill": {"value": "steelblue"}
+        },
+        "hover": {
+          "fill": {"value": "red"}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "encode": {
+        "enter": {
+          "align": {"value": "center"},
+          "baseline": {"value": "bottom"},
+          "fill": {"value": "#333"}
+        },
+        "update": {
+          "x": {"scale": "xscale", "signal": "tooltip.category", "band": 0.5},
+          "y": {"scale": "yscale", "signal": "tooltip.amount", "offset": -2},
+          "text": {"signal": "tooltip.amount"},
+          "fillOpacity": [
+            {"test": "datum === tooltip", "value": 0},
+            {"value": 1}
+          ]
+        }
+      }
+    }
+  ]
+
 ```
 
 ## Изучение работы microsoft threat modeling tool
